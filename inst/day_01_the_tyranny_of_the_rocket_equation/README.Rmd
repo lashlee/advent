@@ -5,6 +5,11 @@ date: "12/8/2019"
 output: github_document
 ---
 
+```{r}
+library(advent)
+```
+
+
 # Introduction
 
 I found out about Advent of Code this year and I really love the idea! I will be documenting my progress here. I hope you enjoy reading my thoughts.

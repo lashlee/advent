@@ -32,7 +32,7 @@ is_windows <- function() {
 write_to_clipboard <- function(data) {
   if (is_mac()) cat(data, file = pipe('pbcopy'))
   if (is_windows()) writeClipboard(as.character(data))
-  invisible(data)
+  data
 }
 
 #' Get data from URL and use cookie
@@ -46,5 +46,5 @@ write_to_clipboard <- function(data) {
 get_data <- function(url, session_cookie = NULL) {
   if (is.null(session_cookie)) session_cookie <- Sys.getenv('AOC_SC')
   res <- httr::GET(url, httr::set_cookies(session = session_cookie))
-  httr::content(res)
+  httr::content(res, encoding = 'UTF-8')
 }

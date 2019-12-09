@@ -8,6 +8,8 @@ Description: Oh not too much, just enjoy checking out my solutions.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports:
+    magrittr
 Suggests:
     httr
 RoxygenNote: 6.1.1

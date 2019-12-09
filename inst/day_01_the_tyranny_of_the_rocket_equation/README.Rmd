@@ -1,0 +1,42 @@
+---
+title: "Day 1"
+author: "john"
+date: "12/8/2019"
+output: github_document
+---
+
+# Introduction
+
+I found out about Advent of Code this year and I really love the idea! I will be documenting my progress here. I hope you enjoy reading my thoughts.
+
+# Utilities
+
+First I need to write a few utilities for getting data from the Advent of Code website and copying it to my clipboard.
+
+## Writing to Clipboard
+
+I want to copy my answers to the clipboard so I can paste them into the website. Here I have a function to detect the operating system, then copy to the clipboard if it is MacOS or Windows.
+
+```{r}
+is_mac
+```
+
+```{r}
+is_windows
+```
+
+```{r}
+write_to_clipboard
+```
+
+Note that `write_to_clipboard` invisibly returns its argument. This allows me to put it into a chain of composed functions and keep the chain evaluating.
+
+## Get Data from Advent of Code
+
+I want to download the input data from Advent of Code, but I need to pass along my session cookie. I do this by using the httr package, storing the session cookie in an environment variable in my .Rsession file.
+
+```{r}
+get_data
+```
+
+

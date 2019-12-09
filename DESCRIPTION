@@ -1,11 +1,13 @@
 Package: advent
 Type: Package
-Title: What the Package Does (Title Case)
+Title: John's Work on Advent of Code 2019
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: person("John", "Lashlee", email = "john.lashlee@gmail.com",
+                  role = c("aut", "cre"))
+Description: Oh not too much, just enjoy checking out my solutions.
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+Suggests:
+    httr
+RoxygenNote: 6.1.1

@@ -5,7 +5,7 @@ date: "12/8/2019"
 output: github_document
 ---
 
-```{r}
+```{r load_packages}
 library(advent)
 library(magrittr)
 ```
@@ -23,15 +23,15 @@ First I need to write a few utilities for getting data from the Advent of Code w
 
 I want to copy my answers to the clipboard so I can paste them into the website. Here I have a function to detect the operating system, then copy to the clipboard if it is MacOS or Windows.
 
-```{r}
+```{r demonstrate_os_check_macos}
 is_mac
 ```
 
-```{r}
+```{r demonstrate_os_check_windows}
 is_windows
 ```
 
-```{r}
+```{r demonstrate_copy}
 write_to_clipboard
 ```
 
@@ -41,7 +41,7 @@ Note that `write_to_clipboard` invisibly returns its argument. This allows me to
 
 I want to download the input data from Advent of Code, but I need to pass along my session cookie. I do this by using the httr package, storing the session cookie in an environment variable in my .Rsession file.
 
-```{r}
+```{r demonstrate_get_data}
 get_data
 ```
 
@@ -64,22 +64,31 @@ The first challenge is to add up some masses and calculate how much fuel it take
 
 Clear enough I hope. My first instinct was to add up all the masses before calculating the fuel, but the guidance explicitly says to add first. I'll write a function that reads the input from the web, calculates the fuel, writes it to the clipboard, and then prints it.
 
-```{r}
+```{r part_1_body}
 fuel_of_mass <- function(mass) max(floor(mass / 3) - 2, 0)
 ```
 
-```{r}
-input <- scan(text = get_data('https://adventofcode.com/2019/day/1/input'))
+Now for the provided tests.
+
+```{r part_1_tests}
+fuel_of_mass(12) == 2
+fuel_of_mass(14) == 2
+fuel_of_mass(1969) == 654
+fuel_of_mass(100756) == 33583
 ```
 
-```{r}
-part_1 <-
+Great, all tests pass.
+
+```{r part_1_solution}
+part_1 <- function() {
   get_data('https://adventofcode.com/2019/day/1/input') %>% 
   scan(text = ., quiet = TRUE) %>% 
   Map(f = fuel_of_mass) %>% 
   Reduce(f = `+`) %>% 
   write_to_clipboard() %>% 
   print()
+}
+part_1()
 ```
 
 Great, it works.
@@ -98,9 +107,39 @@ Part 2 involves calculating the additional fuel needed to carry the fuel itself.
 
 I just need to write a function like `fuel_of_mass` above which can calculate the amount of fuel needed for fuel.
 
-```{r}
-fuel_of_fuel <- function(mass, accumulator = 0) {
-  TRUE # Undefined as yet
+```{r part_2_body}
+fuel_of_fuel <- function(mass_of_fuel, accumulator = 0) {
+  additional_fuel <- fuel_of_mass(mass_of_fuel)
+  if (additional_fuel == 0) return(accumulator)
+  fuel_of_fuel(additional_fuel, accumulator + additional_fuel)
+}
+total_fuel <- function(mass) {
+  fuel_of_mass(mass) + fuel_of_fuel(fuel_of_mass(mass))
 }
 ```
 
+The funciton `fuel_of_fuel` takes a mass of fuel and calculates how much more fuel is required to propel that mass of fuel. If that quantity is zero, then you're done and you just return the accumulated fuel amount. If not, repeat the process by figuring out how much more fuel you need and add the additional fuel to the accumulated fuel amount.
+
+Now for the provided tests.
+
+```{r part_2_tests}
+total_fuel(14) == 2
+total_fuel(1969) == 966
+total_fuel(100756) == 50346
+```
+
+Great, all tests pass.
+
+```{r part_2_solution}
+part_2 <- function() {
+  get_data('https://adventofcode.com/2019/day/1/input') %>% 
+  scan(text = ., quiet = TRUE) %>% 
+  Map(f = total_fuel) %>% 
+  Reduce(f = `+`) %>% 
+  write_to_clipboard() %>% 
+  print()
+}
+part_2()
+```
+
+Great, it works. See you later for more puzzles! If you liked my solutions or have constructive criticism, reach out on Twitter or e-mail me.

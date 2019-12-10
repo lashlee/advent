@@ -32,7 +32,7 @@ is_mac
     ## function() {
     ##   .Platform$OS.type == 'unix' & Sys.info()['sysname'] == 'Darwin'
     ## }
-    ## <bytecode: 0x7fd371bf6330>
+    ## <bytecode: 0x7fe5e8c4b208>
     ## <environment: namespace:advent>
 
 ``` r
@@ -42,7 +42,7 @@ is_windows
     ## function() {
     ##   .Platform$OS.type == 'windows'
     ## }
-    ## <bytecode: 0x7fd371e69100>
+    ## <bytecode: 0x7fe5e8ebf3e0>
     ## <environment: namespace:advent>
 
 ``` r
@@ -54,7 +54,7 @@ write_to_clipboard
     ##   if (is_windows()) writeClipboard(as.character(data))
     ##   invisible(data)
     ## }
-    ## <bytecode: 0x7fd3601dd430>
+    ## <bytecode: 0x7fe5cfa5b7b8>
     ## <environment: namespace:advent>
 
 Note that `write_to_clipboard` invisibly returns its argument. This
@@ -77,7 +77,7 @@ get_data
     ##   res <- httr::GET(url, httr::set_cookies(session = session_cookie))
     ##   httr::content(res, encoding = 'UTF-8')
     ## }
-    ## <bytecode: 0x7fd3603ca200>
+    ## <bytecode: 0x7fe5d8050598>
     ## <environment: namespace:advent>
 
 # Solving the Challenges
@@ -113,18 +113,44 @@ calculates the fuel, writes it to the clipboard, and then prints it.
 fuel_of_mass <- function(mass) max(floor(mass / 3) - 2, 0)
 ```
 
-``` r
-input <- scan(text = get_data('https://adventofcode.com/2019/day/1/input'))
-```
+Now for the provided tests.
 
 ``` r
-part_1 <-
+fuel_of_mass(12) == 2
+```
+
+    ## [1] TRUE
+
+``` r
+fuel_of_mass(14) == 2
+```
+
+    ## [1] TRUE
+
+``` r
+fuel_of_mass(1969) == 654
+```
+
+    ## [1] TRUE
+
+``` r
+fuel_of_mass(100756) == 33583
+```
+
+    ## [1] TRUE
+
+Great, all tests pass.
+
+``` r
+part_1 <- function() {
   get_data('https://adventofcode.com/2019/day/1/input') %>% 
   scan(text = ., quiet = TRUE) %>% 
   Map(f = fuel_of_mass) %>% 
   Reduce(f = `+`) %>% 
   write_to_clipboard() %>% 
   print()
+}
+part_1()
 ```
 
     ## [1] 3412531
@@ -163,7 +189,58 @@ I just need to write a function like `fuel_of_mass` above which can
 calculate the amount of fuel needed for fuel.
 
 ``` r
-fuel_of_fuel <- function(mass, accumulator = 0) {
-  TRUE # Undefined as yet
+fuel_of_fuel <- function(mass_of_fuel, accumulator = 0) {
+  additional_fuel <- fuel_of_mass(mass_of_fuel)
+  if (additional_fuel == 0) return(accumulator)
+  fuel_of_fuel(additional_fuel, accumulator + additional_fuel)
+}
+total_fuel <- function(mass) {
+  fuel_of_mass(mass) + fuel_of_fuel(fuel_of_mass(mass))
 }
 ```
+
+The funciton `fuel_of_fuel` takes a mass of fuel and calculates how much
+more fuel is required to propel that mass of fuel. If that quantity is
+zero, then you’re done and you just return the accumulated fuel amount.
+If not, repeat the process by figuring out how much more fuel you need
+and add the additional fuel to the accumulated fuel amount.
+
+Now for the provided tests.
+
+``` r
+total_fuel(14) == 2
+```
+
+    ## [1] TRUE
+
+``` r
+total_fuel(1969) == 966
+```
+
+    ## [1] TRUE
+
+``` r
+total_fuel(100756) == 50346
+```
+
+    ## [1] TRUE
+
+Great, all tests pass.
+
+``` r
+part_2 <- function() {
+  get_data('https://adventofcode.com/2019/day/1/input') %>% 
+  scan(text = ., quiet = TRUE) %>% 
+  Map(f = total_fuel) %>% 
+  Reduce(f = `+`) %>% 
+  write_to_clipboard() %>% 
+  print()
+}
+part_2()
+```
+
+    ## [1] 5115927
+
+Great, it works. See you later for more puzzles\! If you liked my
+solutions or have constructive criticism, reach out on Twitter or e-mail
+me.

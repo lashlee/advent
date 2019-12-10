@@ -114,15 +114,17 @@ First I'll revisit my part 1 solution and parametrize it by the noun and verb.
 
 ```{r}
 part_1_revisited <- function(noun, verb, input = NULL) {
-  if (is.null(input)) {
-    input <- 
-      get_data('https://adventofcode.com/2019/day/2/input') %>% 
-      scan(text = ., sep = ',', quiet = TRUE)
-  }
-  input %>% 
+  #if (is.null(input)) {
+  #  input <- 
+  #    get_data('https://adventofcode.com/2019/day/2/input') %>% 
+  #    scan(text = ., sep = ',', quiet = TRUE)
+  #}
+  res <-
+    input %>% 
     replace(c(2, 3), c(noun , verb)) %>% 
     parse_intcode() %>% 
     `[`(1)
+  res
 }
 ```
 
@@ -164,3 +166,32 @@ part_2(input = input, verbose = TRUE)
 ```
 
 And there is a bug in here! Eh, I'll find it later. :)
+
+## The next day...
+
+The bug was that I wasn't checking all combinations! I'm going to check all noun and verb values which are less than or equal to the length of the input. If that doesn't work, I will try a different solver. I will try to find the minimum noun, verb combination.
+
+```{r part_2_solution_second_pass}
+part_2_second_pass <- function(critical_value = 19690720, input = NULL) {
+  if (is.null(input)) {
+    input <- 
+      get_data('https://adventofcode.com/2019/day/2/input') %>% 
+      scan(text = ., sep = ',', quiet = TRUE)
+  }
+  small_combs <- expand.grid(noun = seq_along(input), verb = seq_along(input))
+  small_combs <- small_combs[order(small_combs$noun + small_combs$verb, small_combs$noun), ]
+  part_1_vals <- mapply(
+    function(noun, verb) part_1_revisited(noun, verb, input = input), 
+    small_combs$noun, 
+    small_combs$verb
+  )
+  n_v <- small_combs[which(part_1_vals == critical_value), ][1, ]
+  print(write_to_clipboard(100 * n_v$noun + n_v$verb))
+}
+```
+
+```{r call_part_2_solution}
+part_2_second_pass(input = input)
+```
+
+Great, it works. See you later for more puzzles.

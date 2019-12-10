@@ -1,4 +1,4 @@
-This is my little package for Advent of Code 2019. Check out the README files in the [inst/](https://github.com/lashlee/advent/blob/master/inst/) folder.
+This is my little package for [Advent of Code 2019](https://adventofcode.com/2019/). Check out the README files in the [inst/](https://github.com/lashlee/advent/blob/master/inst/) folder.
 
 For example:
 

@@ -21,7 +21,9 @@ input <-
 ```
 
 
-# Problem
+# Solving the Challenges
+
+## Challenge 1
 
 > An Intcode program is a list of integers separated by commas (like 1,0,0,3,99). To run one, start by looking at the first integer (called position 0). Here, you will find an opcode - either 1, 2, or 99. The opcode indicates what to do; for example, 99 means that the program is finished and should immediately halt. Encountering an unknown opcode means something went wrong.
 > 
@@ -87,3 +89,78 @@ part_1(input)
 ```
 
 Great, it works.
+
+## Challenge 2
+
+This one is a doozy! I'll just paste the answer in its entirety rather than try to edit for brevity.
+
+> Intcode programs are given as a list of integers; these values are used as the initial state for the computer's memory. When you run an Intcode program, make sure to start by initializing memory to the program's values. A position in memory is called an address (for example, the first value in memory is at "address 0").
+> 
+> Opcodes (like 1, 2, or 99) mark the beginning of an instruction. The values used immediately after an opcode, if any, are called the instruction's parameters. For example, in the instruction 1,2,3,4, 1 is the opcode; 2, 3, and 4 are the parameters. The instruction 99 contains only an opcode and has no parameters.
+> 
+> The address of the current instruction is called the instruction pointer; it starts at 0. After an instruction finishes, the instruction pointer increases by the number of values in the instruction; until you add more instructions to the computer, this is always 4 (1 opcode + 3 parameters) for the add and multiply instructions. (The halt instruction would increase the instruction pointer by 1, but it halts the program instead.)
+> 
+> "With terminology out of the way, we're ready to proceed. To complete the gravity assist, you need to determine what pair of inputs produces the output 19690720."
+> 
+> The inputs should still be provided to the program by replacing the values at addresses 1 and 2, just like before. In this program, the value placed in address 1 is called the noun, and the value placed in address 2 is called the verb. Each of the two input values will be between 0 and 99, inclusive.
+> 
+> Once the program has halted, its output is available at address 0, also just like before. Each time you try a pair of inputs, make sure you first reset the computer's memory to the values in the program (your puzzle input) - in other words, don't reuse memory from a previous attempt.
+> 
+> Find the input noun and verb that cause the program to produce the output 19690720. What is 100 * noun + verb? (For example, if noun=12 and verb=2, the answer would be 1202.)
+
+So I need to find the two replacement values, noun and verb respectively which produce the solution 19690720, and then compute `100 * noun + verb`.
+
+First I'll revisit my part 1 solution and parametrize it by the noun and verb.
+
+```{r}
+part_1_revisited <- function(noun, verb, input = NULL) {
+  if (is.null(input)) {
+    input <- 
+      get_data('https://adventofcode.com/2019/day/2/input') %>% 
+      scan(text = ., sep = ',', quiet = TRUE)
+  }
+  input %>% 
+    replace(c(2, 3), c(noun , verb)) %>% 
+    parse_intcode() %>% 
+    `[`(1)
+}
+```
+
+And just for good measure, check that the revisited parametrized solution gives identical output to the prior solution for the same noun and verb.
+
+```{r}
+identical(part_1_revisited(12, 2, input), part_1(input))
+```
+
+Great, it does.
+
+Now write the world's dumbest solver. It will try noun and verb equal to 1. Then it will increment one, then the other, etc., all the while checking if the output is 19690720.
+
+```{r}
+part_2 <- function(noun = 0, verb = 0, input = NULL, add_to = 'noun', verbose = TRUE) {
+  if (is.null(input)) {
+    input <- 
+      get_data('https://adventofcode.com/2019/day/2/input') %>% 
+      scan(text = ., sep = ',', quiet = TRUE)
+  }
+  check <- part_1_revisited(noun, verb, input)
+  if (verbose) {
+    cat(paste0('Noun, Verb, Check: ', noun, ', ', verb, ', ', check, '\n'))
+  }
+  if (noun + verb > 10) return('Eh, whatever, I\'ll find the bug later!')
+  if (check == 19690720) {
+    res <- print(write_to_clipboard(100 * noun + verb))
+    return(res)
+  } else if (add_to == 'noun') {
+    part_2(noun + 1, verb, input = input, add_to = 'verb', verbose = verbose)
+  } else if (add_to == 'verb') {
+    part_2(noun, verb + 1, input = input, add_to = 'noun', verbose = verbose)
+  }
+}
+```
+
+```{r}
+part_2(input = input, verbose = TRUE)
+```
+
+And there is a bug in here! Eh, I'll find it later. :)

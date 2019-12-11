@@ -183,11 +183,11 @@ verb.
 
 ``` r
 part_1_revisited <- function(noun, verb, input = NULL) {
-  #if (is.null(input)) {
-  #  input <- 
-  #    get_data('https://adventofcode.com/2019/day/2/input') %>% 
-  #    scan(text = ., sep = ',', quiet = TRUE)
-  #}
+  if (is.null(input)) {
+    input <- 
+      get_data('https://adventofcode.com/2019/day/2/input') %>% 
+      scan(text = ., sep = ',', quiet = TRUE)
+  }
   res <-
     input %>% 
     replace(c(2, 3), c(noun , verb)) %>% 
